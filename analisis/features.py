@@ -6,7 +6,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.metrics import log_loss, accuracy_score
-from purgedFolk import PurgedFolk
+from purgedFolk import PurgedKFold
 
 
 def featureImportandeMDI (fit, featNames):
@@ -37,7 +37,5 @@ def featureImportanceMDA (clf, X, y, cv, sample,_weight, t1, pctEmbargo, scoring
     """
     if scoring not in ['neg_log_loss', 'accuracy']:
         raise Exception('Tipo de scoring no reconocido')
-    cvGen = PurgedFolk(n_splits=cv, t1=t1, pctEmbrago=pctEmbargo)
+    cvGen = PurgedKFold(n_splits=cv, t1=t1, pctEmbrago=pctEmbargo)
     scr0, scr1 = pd.Series(), pd.DataFrame(columns=X.columns)
-
-    cosaafafd afadfadf
