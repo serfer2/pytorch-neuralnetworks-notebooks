@@ -27,7 +27,7 @@ def featureImportandeMDI (fit, featNames):
     return imp
 
 
-def featureImportanceMDA (clf, X, y, cv, sample,_weight, t1, pctEmbargo, scoring='neg_log_loss'):
+def featureImportanceMDA (clf, X, y, cv, sample_weight, t1, pctEmbargo, scoring='neg_log_loss'):
     """
     Mean Decrease Accuracy (MDA) para analizar la importancia de las features.
     Complementa bien al análisis de MDI. Es Out Of Sample (OOS) y vale para 
@@ -37,5 +37,29 @@ def featureImportanceMDA (clf, X, y, cv, sample,_weight, t1, pctEmbargo, scoring
     """
     if scoring not in ['neg_log_loss', 'accuracy']:
         raise Exception('Tipo de scoring no reconocido')
-    cvGen = PurgedKFold(n_splits=cv, t1=t1, pctEmbrago=pctEmbargo)
+    cvGen = PurgedKFold(n_splits=cv, t1=t1, pctEmbargo=pctEmbargo)
     scr0, scr1 = pd.Series(), pd.DataFrame(columns=X.columns)
+
+    for i, (train, test) in enumerate( cvGen.split(X=X) ):
+        
+        X0, y0, w0 = X.iloc[train, :], y.iloc[train], sample_weight.iloc[train]
+        X1, y1, w1 = X.iloc[test, :], y.iloc[test], sample_weight.iloc[test]
+
+        fit = clf.fit(X=X0, y=y0, sample_weight=w0.values)
+
+        if scoring == 'neg_log_loss':
+
+            prob = fit.predict_proba(X1)
+            scr0.loc[i] = -float(log_loss(y1, prob, sample_weight=w1.values, labels=clf.classes_)) # float
+        
+        else:
+
+            pred = fit.predict(X1)
+            scr0.loc[i] = accuracy_score(y1, pred, sample_weight=w1.values)
+
+        
+        
+
+
+
+
